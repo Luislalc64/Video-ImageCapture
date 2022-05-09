@@ -100,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     private void getCameraPermission(){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)==PackageManager.PERMISSION_DENIED){
 
@@ -114,49 +113,23 @@ public class MainActivity extends AppCompatActivity {
     private void captureImage(){
 
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File imageFile = null;
-        try {
-            imageFile = getImage();
-
-
-
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-        if (imageFile!=null){
-            Uri imageUri = FileProvider.getUriForFile(this, "com.example.android.fileprovider", imageFile);
             startActivityForResult(intent, REQUEST_IMAGE_CAPTURE );
-            saveimage.setVisibility(View.VISIBLE);
-            descartar.setVisibility(View.VISIBLE);
-
-
-
-
         }
-    }
-    private File getImage() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyMMdd_HHmmss").format(new Date());
-        String imageName = "jpg_"+timeStamp+"_";
-        File storagedir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File imageFile = File.createTempFile(imageName, ".jpg", storagedir);
-        return imageFile;
-    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode==REQUEST_IMAGE_CAPTURE){
-            if (resultCode == RESULT_OK){
-                videoPath = data.getData();
-                Bitmap bm = (Bitmap) data.getExtras().get("data");
-                imageView.setImageBitmap(bm);
-            Log.i("VIDEO_RECORD_TAG", "Video is recorded" + videoPath);
-            }else if (resultCode == RESULT_CANCELED){
-                Log.i("VIDEO_RECORD_TAG", "Video is CANCELLED");
+        if (requestCode==VIDEO_RECORD_CODE){
+            Toast.makeText(this, "Video Guardado en Galeria", Toast.LENGTH_LONG).show();
 
-            }else{
-                Log.i("VIDEO_RECORD_TAG", "Video got some error");
 
-            }
+        }else if(requestCode==REQUEST_IMAGE_CAPTURE){
+            videoPath = data.getData();
+            Bitmap bm = (Bitmap) data.getExtras().get("data");
+            imageView.setImageBitmap(bm);
+            saveimage.setVisibility(View.VISIBLE);
+            descartar.setVisibility(View.VISIBLE);
+
         }
 
     }
