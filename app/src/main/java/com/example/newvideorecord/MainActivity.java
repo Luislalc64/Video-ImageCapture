@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private Uri videoPath;
     ImageView imageView;
     Button saveimage;
+    Button descartar;
 
     @Override
 
@@ -44,33 +46,31 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         imageView = (ImageView)findViewById(R.id.imageview);
         saveimage = (Button)findViewById(R.id.savegallery);
+        descartar = (Button)findViewById(R.id.button3);
+
         if (isCameraPresent()){
             Log.i("Video_Record_Tag", " detected");
             getCameraPermission();
         }else{
             Log.i("Video_Record_Tag", "no detected");
         }
-
-
     }
 
 
-    public void openFolder()
-    {
-        // location = "/sdcard/my_folder";
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        Uri mydir = Uri.parse("/Android/data/com.example.newvideorecord/files/Pictures/");
-        intent.setDataAndType(mydir,"*/*");    // or use */*
-        startActivity(intent);
-    }
     public void savetogallery(View view) throws IOException {saveToGallery();}
     public void recordVideoButtonPressed(View view){
         recordVideo();
     }
     public void captureImageButtonPressed(View view){
-        saveimage.setVisibility(View.VISIBLE);
         captureImage();
     }
+    public void restart(View view){
+        Toast.makeText(this, "IMAGEN DESCARTADA", Toast.LENGTH_LONG).show();
+        saveimage.setVisibility(View.GONE);
+        descartar.setVisibility(View.GONE);
+        imageView.setImageBitmap(null);
+    }
+
 
     private boolean isCameraPresent(){
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)){
@@ -93,7 +93,10 @@ public class MainActivity extends AppCompatActivity {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
         outStream.flush();
         outStream.close();
-
+        Toast.makeText(this, "IMAGEN GUARDADA", Toast.LENGTH_LONG).show();
+        saveimage.setVisibility(View.GONE);
+        descartar.setVisibility(View.GONE);
+        imageView.setImageBitmap(null);
 
     }
 
@@ -109,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, VIDEO_RECORD_CODE);
     }
     private void captureImage(){
+
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         File imageFile = null;
         try {
@@ -122,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
         if (imageFile!=null){
             Uri imageUri = FileProvider.getUriForFile(this, "com.example.android.fileprovider", imageFile);
             startActivityForResult(intent, REQUEST_IMAGE_CAPTURE );
+            saveimage.setVisibility(View.VISIBLE);
+            descartar.setVisibility(View.VISIBLE);
 
 
 
