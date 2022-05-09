@@ -26,21 +26,38 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="132dp"
         android:layout_marginTop="52dp"
+        android:layout_marginEnd="137dp"
         android:onClick="captureImageButtonPressed"
         android:text="Take Picture"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button" />
 
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:onClick="openImageDirectory"
-        android:text="Open Gallery"
+    <ImageView
+        android:id="@+id/imageview"
+        android:layout_width="114dp"
+        android:layout_height="179dp"
+        android:layout_gravity="center"
+        android:layout_marginStart="149dp"
+        android:layout_marginEnd="149dp"
+        android:layout_marginBottom="52dp"
+        app:layout_constraintBottom_toTopOf="@+id/savegallery"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/button2" />
+
+    <Button
+        android:id="@+id/savegallery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="175dp"
+        android:text="Save Image"
+        android:onClick="savetogallery"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

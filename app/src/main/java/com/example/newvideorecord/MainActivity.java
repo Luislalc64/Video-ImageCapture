@@ -10,15 +10,20 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private static int VIDEO_RECORD_CODE = 101;
     private static final int REQUEST_IMAGE_CAPTURE  = 102;
     private Uri videoPath;
+    ImageView imageView;
+    Button saveimage;
 
     @Override
 
@@ -35,13 +42,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        imageView = (ImageView)findViewById(R.id.imageview);
+        saveimage = (Button)findViewById(R.id.savegallery);
         if (isCameraPresent()){
             Log.i("Video_Record_Tag", " detected");
             getCameraPermission();
         }else{
             Log.i("Video_Record_Tag", "no detected");
         }
+
+
     }
+
+
     public void openFolder()
     {
         // location = "/sdcard/my_folder";
@@ -50,15 +63,15 @@ public class MainActivity extends AppCompatActivity {
         intent.setDataAndType(mydir,"*/*");    // or use */*
         startActivity(intent);
     }
+    public void savetogallery(View view) throws IOException {saveToGallery();}
     public void recordVideoButtonPressed(View view){
         recordVideo();
     }
     public void captureImageButtonPressed(View view){
+        saveimage.setVisibility(View.VISIBLE);
         captureImage();
     }
-    public void openImageDirectory(View view){
-        openFolder();
-    }
+
     private boolean isCameraPresent(){
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)){
             return  true;
@@ -66,6 +79,25 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
     }
+
+    private void saveToGallery() throws IOException {
+        BitmapDrawable draw = (BitmapDrawable) imageView.getDrawable();
+        Bitmap bitmap = draw.getBitmap();
+        FileOutputStream outStream = null;
+        File sdCard = Environment.getExternalStorageDirectory();
+        File dir = new File(sdCard.getAbsolutePath() + "/Pictures");
+        dir.mkdirs();
+        String fileName = String.format("%d.jpg", System.currentTimeMillis());
+        File outFile = new File(dir, fileName);
+        outStream = new FileOutputStream(outFile);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outStream);
+        outStream.flush();
+        outStream.close();
+
+
+    }
+
+
     private void getCameraPermission(){
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)==PackageManager.PERMISSION_DENIED){
 
@@ -82,13 +114,18 @@ public class MainActivity extends AppCompatActivity {
         try {
             imageFile = getImage();
 
+
+
         } catch (IOException e){
             e.printStackTrace();
         }
         if (imageFile!=null){
             Uri imageUri = FileProvider.getUriForFile(this, "com.example.android.fileprovider", imageFile);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
             startActivityForResult(intent, REQUEST_IMAGE_CAPTURE );
+
+
+
+
         }
     }
     private File getImage() throws IOException {
@@ -101,9 +138,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode==VIDEO_RECORD_CODE){
+        if (requestCode==REQUEST_IMAGE_CAPTURE){
             if (resultCode == RESULT_OK){
                 videoPath = data.getData();
+                Bitmap bm = (Bitmap) data.getExtras().get("data");
+                imageView.setImageBitmap(bm);
             Log.i("VIDEO_RECORD_TAG", "Video is recorded" + videoPath);
             }else if (resultCode == RESULT_CANCELED){
                 Log.i("VIDEO_RECORD_TAG", "Video is CANCELLED");
